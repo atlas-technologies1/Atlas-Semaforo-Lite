@@ -1,0 +1,17 @@
+{
+  "version": "0.16",
+  "staticContractsExecuted": true,
+  "pureKotlinCompileExecuted": true,
+  "pureKotlinHarnessExecuted": true,
+  "androidGradleCompileExecuted": false,
+  "apkProduced": false,
+  "apkSignatureVerified": false,
+  "physicalDeviceTested": false,
+  "githubPluginInstalled": true,
+  "githubActionsToolExposedInThisRuntime": false,
+  "accessibilityServiceUsed": false,
+  "uberActionsAutomated": false,
+  "capturePersistence": false,
+  "ocrPersistence": false,
+  "overlayConsumesTouches": false
+}

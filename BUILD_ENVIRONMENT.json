@@ -1,0 +1,8 @@
+{
+  "java": "/usr/bin/java",
+  "gradle": null,
+  "sdkmanager": null,
+  "adb": null,
+  "apksigner": null,
+  "kotlinc": "/root/.sdkman/candidates/kotlin/current/bin/kotlinc"
+}
