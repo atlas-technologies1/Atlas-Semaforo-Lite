@@ -12,7 +12,7 @@ assert 'FLAG_NOT_TOUCHABLE' in overlay
 assert 'FLAG_SECURE' not in overlay
 assert 'AccessibilityService' not in service + overlay
 assert 'performClick' not in service + overlay
-assert 'versionName = "0.19"' in build
+assert 'versionName = "0.26"' in build
 print('CapturedContentResizeContract: PASS')
 print('SingleVirtualDisplayPerTokenContract: PASS')
 print('SurfaceReplacementContract: PASS')

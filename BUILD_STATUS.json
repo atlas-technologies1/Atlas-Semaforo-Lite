@@ -1,15 +1,9 @@
 {
-  "version": "0.19",
-  "androidGradleCompileExecuted": false,
-  "apkProduced": false,
-  "apkSignatureVerified": false,
-  "physicalDeviceTested": false,
-  "v016PhysicalInstallAndLaunchObserved": true,
-  "v016ForegroundServiceObserved": true,
-  "v016OverlayObservedAtLeastOnce": true,
-  "v016OverlayScreenshotBlockedObserved": true,
-  "capturePersistence": false,
-  "ocrPersistence": false,
-  "accessibilityServiceUsed": false,
-  "uberActionsAutomated": false
+  "version": "0.26",
+  "local_android_compile_executed": false,
+  "apk_produced_locally": false,
+  "physical_device_test_executed": false,
+  "pure_kotlin_tests_executed": true,
+  "static_contracts_executed": true,
+  "notes": "v0.26 preserves the v0.25 weighted economic score and RAM-only service memory, adds the official traffic-light launcher/adaptive icon, bumps Android version to 0.26, and fixes GitHub artifact naming. Local Android compilation/APK/device test remain pending because Gradle/SDK/ADB/apksigner are unavailable in this runtime."
 }

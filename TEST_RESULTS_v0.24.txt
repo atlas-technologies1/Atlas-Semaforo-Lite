@@ -1,0 +1,68 @@
+Atlas Semáforo Lite v0.24 - local verification
+Date: 2026-09-01
+
+[Pure Kotlin service-memory]
+OfferDoesNotBecomeAcceptedImmediately: PASS
+OneActiveReadInsufficient: PASS
+TwoActiveReadsConfirmAcceptance: PASS
+AcceptedFareRetained: PASS
+AcceptedRatingRetained: PASS
+AcceptedPassengerTripsRetained: PASS
+NewOfferDoesNotEraseCurrentService: PASS
+OneFinishReadInsufficient: PASS
+TwoFinishReadsClearCurrentService: PASS
+LateActiveScreenDoesNotMisattributeOldOffer: PASS
+ClassifierRequiresTwoActiveSignals: PASS
+ClassifierRecognizesActive: PASS
+ClassifierRecognizesFinish: PASS
+
+[Pure Kotlin parser fixture]
+PhysicalGreenFixtureParsed: PASS
+PassengerTrips193Parsed: PASS
+Rating493Parsed: PASS
+Confidence98: PASS
+
+[v0.24 contracts]
+Version024Contract: PASS
+PassengerTripsParsed: PASS
+RamOnlyServiceMemory: PASS
+IndependentOfferAndActiveOverlays: PASS
+PipelineKeepsScanning: PASS
+ConservativeAcceptance: PASS
+ConservativeFinish: PASS
+NoInternetPermission: PASS
+NoAccessibilityService: PASS
+NoUberActionAutomation: PASS
+PassThroughOverlay: PASS
+EphemeralBitmap: PASS
+
+[Inherited configurable-policy contracts]
+Version024InheritedConfigContract: PASS
+LocalPersistentPolicyContract: PASS
+PolicyLoadedAtServiceStartContract: PASS
+ConfigurableKmContract: PASS
+ConfigurableHourContract: PASS
+ConfigurableRatingContract: PASS
+ResetDefaultsContract: PASS
+NoInternetPermission: PASS
+NoAccessibilityService: PASS
+NoUberActionAutomation: PASS
+
+[Static safety/lifecycle contracts]
+CompleteAndroidProjectContract: PASS
+ServiceStopLifecycleContract: PASS
+OverlayPermissionRaceContract: PASS
+ScreenshotCompatibleOverlayContract: PASS
+PassThroughOverlayContract: PASS
+IndependentStaleOverlayFailsafe: PASS
+RgbaPlaneLayoutContract: PASS
+EphemeralCaptureContract: PASS
+EphemeralOcrContract: PASS
+OcrCloseRaceContract: PASS
+NoAccessibilityService: PASS
+NoUberActionAutomation: PASS
+GitHubTruthGateContract: PASS
+
+Android compile: NOT EXECUTED (Gradle executable/wrapper unavailable in this runtime)
+APK produced: NO
+Physical device test v0.24: NOT EXECUTED

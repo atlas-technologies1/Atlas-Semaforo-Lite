@@ -2,8 +2,8 @@ package com.atlas.semaforo
 
 fun main() {
     val engine = SemaforoEngine()
-    val a = OfferCandidate(14027, 3.3, 11, 8.2, 24, 4.95, 1230.0, 98)
-    val b = OfferCandidate(10000, 1.0, 5, 3.0, 10, 4.90, null, 90)
+    val a = OfferCandidate(14027, 3.3, 11, 8.2, 24, 4.95, null, 1230.0, 98)
+    val b = OfferCandidate(10000, 1.0, 5, 3.0, 10, 4.90, null, null, 90)
 
     val gate1 = StableDecisionGate()
     check(gate1.onOffer(1000, a, engine).decision == null)

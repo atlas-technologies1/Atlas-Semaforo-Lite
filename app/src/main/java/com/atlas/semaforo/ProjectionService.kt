@@ -97,7 +97,8 @@ class ProjectionService : Service() {
         captureHandler = handler
 
         val overlay = SemaforoOverlay(this)
-        pipeline = OfferFramePipeline(overlay)
+        val policy = PolicyStore(this).load()
+        pipeline = OfferFramePipeline(overlay, SemaforoEngine(policy))
 
         val manager = getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
         val p = manager.getMediaProjection(resultCode, data)

@@ -1,0 +1,30 @@
+Atlas Semáforo Lite v0.26 - local verification
+
+Executed static Python contract suite: PASS
+- configurable policy persistence: PASS
+- weighted score 45/45/10: PASS
+- hard floors: PASS
+- service RAM memory: PASS
+- app-only MediaProjection resize contracts: PASS
+- overlay pass-through / no FLAG_SECURE: PASS
+- fast-path / quick disappear: PASS
+- launcher + adaptive icon resources: PASS
+- workflow artifact v0.26 naming: PASS
+- no AccessibilityService: PASS
+- no Uber action automation: PASS
+
+Executed Kotlin harnesses:
+- ScoreHarness: PASS
+  BalancedStrongGreen
+  StrongHourCompensatesWeakKm
+  StrongKmCompensatesWeakHour
+  BothBelowMinimumRed
+  HardFloorCapsGreen
+  RatingCanBeDisabled
+- V024Harness service memory: PASS
+  acceptance inference, retained fare/rating/trips, continued scanning,
+  finish inference, stale-offer rejection, active/finish classifier
+
+Android compile v0.26: NOT EXECUTED locally
+APK v0.26 produced locally: NO
+Physical device test v0.26: NOT EXECUTED

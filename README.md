@@ -1,31 +1,30 @@
-# Atlas Semáforo Lite v0.20
+# Atlas Semáforo Lite v0.26
 
-v0.20 consolidates the app-only projection hardening from v0.19 and prevents overlay flicker caused by a single transient OCR mismatch.
+Versión personal: motor económico compensado + memoria temporal de servicio.
 
-Changes:
-- prominent centered decision card with strong red/yellow/green background, white border, large title and economics;
-- overlay remains fully pass-through (`FLAG_NOT_TOUCHABLE`);
-- removed `FLAG_SECURE` so the user can take screenshots of the result;
-- self-OCR risk is reduced by not printing a standalone `COP...` fare line nor pickup/trip syntax in the overlay;
-- transient OCR loss tolerance increased: gate 8 s, independent overlay failsafe 10 s;
-- operational regression fixture added for COP14,027 / 3.3 km pickup / 8.2 km trip / 35 min total.
+## Novedad principal v0.26
+- Sustituye el semáforo rígido por un score económico ponderado: 45% COP/km + 45% COP/h + 10% rating.
+- Un indicador fuerte puede compensar parcialmente otro débil; ya no se rechaza automáticamente una oferta porque una sola métrica quede amarilla/roja.
+- Umbrales del score: verde >=80, amarillo 60-79, rojo <60.
+- Protección: si COP/km o COP/h cae bajo su piso duro, el resultado no puede ser verde; si ambas métricas quedan bajo sus mínimos, el resultado es rojo.
+- Pisos configurables por el usuario: 1.200 COP/km y 22.000 COP/h por defecto.
+- Overlay muestra score 0-100, subscore Km/Hora/Cliente y una explicación breve (p. ej. “hora compensa km”).
+- Mantiene configuración local de v0.23 y memoria temporal de servicio de v0.24.
 
-Privacy and safety remain unchanged: MediaProjection consent is explicit, OCR/captures are ephemeral, no AccessibilityService, and no Uber action automation.
-
-Truth status of this source package must be updated only after an actual Android build and device test.
-
-
-## v0.19 — App-only MediaProjection resize hardening
-- Handles Android 14+ `MediaProjection.Callback.onCapturedContentResize`.
-- Reuses the same `VirtualDisplay` session; never calls `createVirtualDisplay` twice.
-- Replaces the `ImageReader` surface when the shared-app region changes size, then calls `VirtualDisplay.resize()` + `setSurface()`.
-- Keeps OCR frames ephemeral; no screenshots or OCR text are persisted.
-- Overlay remains informational and `FLAG_NOT_TOUCHABLE`.
+### Identidad visual Android
+- Icono oficial: un semáforo literal rojo/amarillo/verde.
+- Incluye icono launcher clásico y adaptive icon para Android 8+.
+- El manifiesto referencia `@mipmap/ic_launcher` y `@mipmap/ic_launcher_round`.
+- El activo se mantiene local dentro del APK; no agrega permisos ni red.
 
 
-## v0.20 — Stable confirmed-overlay gate
+## Privacidad y límites
+- Sin AccessibilityService.
+- Sin clics, gestos ni aceptación/rechazo automático en Uber.
+- Capturas, Bitmap y OCR efímeros.
+- Solo campos estructurados del servicio activo permanecen temporalmente en RAM.
+- Sin permiso INTERNET.
+- Overlays informativos y no táctiles.
 
-- A confirmed informational overlay is no longer hidden by one changed/partial OCR read.
-- A replacement offer must independently reach the 2-read consensus before replacing the visible decision.
-- The old decision still fails closed after 8 seconds without a fresh confirmation, including while unconfirmed candidates keep arriving.
-- No AccessibilityService, no Uber action automation, and no screenshot/OCR persistence.
+## Estado de verificación
+Pruebas puras Kotlin y contratos locales v0.26: pruebas de icono y contratos locales ejecutadas. Compilación Android/APK/prueba física v0.26: NO ejecutadas en este runtime.

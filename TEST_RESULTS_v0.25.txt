@@ -1,0 +1,43 @@
+Atlas Semáforo Lite v0.25 - local verification
+Date: 2026-09-01
+
+[Weighted score pure Kotlin]
+BalancedStrongGreen: PASS
+StrongHourCompensatesWeakKm: PASS
+StrongKmCompensatesWeakHour: PASS
+BothBelowMinimumRed: PASS
+HardFloorCapsGreen: PASS
+RatingCanBeDisabled: PASS
+
+[Service memory inherited pure Kotlin]
+OfferDoesNotBecomeAcceptedImmediately: PASS
+OneActiveReadInsufficient: PASS
+TwoActiveReadsConfirmAcceptance: PASS
+AcceptedFareRetained: PASS
+AcceptedRatingRetained: PASS
+AcceptedPassengerTripsRetained: PASS
+NewOfferDoesNotEraseCurrentService: PASS
+OneFinishReadInsufficient: PASS
+TwoFinishReadsClearCurrentService: PASS
+LateActiveScreenDoesNotMisattributeOldOffer: PASS
+ClassifierRequiresTwoActiveSignals: PASS
+ClassifierRecognizesActive: PASS
+ClassifierRecognizesFinish: PASS
+
+[Static/contracts]
+Version025Contract: PASS
+WeightedScore45_45_10: PASS
+HardFloorKmConfig: PASS
+HardFloorHourConfig: PASS
+ScoreThresholds: PASS
+CompensationReason: PASS
+OverlayExplainsScore: PASS
+NoAccessibilityService: PASS
+NoUberActionAutomation: PASS
+EphemeralCaptureContract: PASS
+EphemeralOcrContract: PASS
+PassThroughOverlayContract: PASS
+
+Android compile v0.25: NOT EXECUTED
+APK v0.25 produced: NO
+Physical device test v0.25: NOT EXECUTED

@@ -11,8 +11,8 @@ android {
         applicationId = "com.atlas.semaforo"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1900
-        versionName = "0.19"
+        versionCode = 2600
+        versionName = "0.26"
     }
 
     buildTypes {

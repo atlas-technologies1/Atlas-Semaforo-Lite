@@ -4,7 +4,7 @@ src = "\n".join(p.read_text() for p in (r/"app/src/main/java").rglob("*.kt"))
 manifest = (r/"app/src/main/AndroidManifest.xml").read_text()
 workflow = (r/".github/workflows/android-debug.yml").read_text()
 
-assert 'versionName = "0.19"' in (r/"app/build.gradle.kts").read_text()
+assert 'versionName = "0.26"' in (r/"app/build.gradle.kts").read_text()
 assert "context.stopService" in src
 assert "FLAG_SECURE" not in src
 assert "FLAG_NOT_TOUCHABLE" in src
