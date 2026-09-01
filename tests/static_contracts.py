@@ -4,9 +4,9 @@ src = "\n".join(p.read_text() for p in (r/"app/src/main/java").rglob("*.kt"))
 manifest = (r/"app/src/main/AndroidManifest.xml").read_text()
 workflow = (r/".github/workflows/android-debug.yml").read_text()
 
-assert 'versionName = "0.16"' in (r/"app/build.gradle.kts").read_text()
+assert 'versionName = "0.19"' in (r/"app/build.gradle.kts").read_text()
 assert "context.stopService" in src
-assert "FLAG_SECURE" in src
+assert "FLAG_SECURE" not in src
 assert "FLAG_NOT_TOUCHABLE" in src
 assert "postDelayed" in src
 assert "RgbaPlaneLayoutCalculator.calculate" in src
@@ -28,7 +28,7 @@ for forbidden in ["AccessibilityService","dispatchGesture","performClick(","UiAu
 print("CompleteAndroidProjectContract: PASS")
 print("ServiceStopLifecycleContract: PASS")
 print("OverlayPermissionRaceContract: PASS")
-print("SecureOverlayContract: PASS")
+print("ScreenshotCompatibleOverlayContract: PASS")
 print("PassThroughOverlayContract: PASS")
 print("IndependentStaleOverlayFailsafe: PASS")
 print("RgbaPlaneLayoutContract: PASS")

@@ -34,7 +34,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         val status = TextView(this).apply {
-            text = "Atlas Semáforo Lite v0.16\nSolo informa. No acepta ni rechaza viajes."
+            text = "Atlas Semáforo Lite v0.20\nSolo informa. No acepta ni rechaza viajes."
             textSize = 18f
         }
 

@@ -5,7 +5,7 @@ data class GateEvent(val decision: SemaforoDecision?, val hideOverlay: Boolean)
 class StableDecisionGate(
     private val requiredReads: Int = 2,
     private val maxGapMs: Long = 2500,
-    private val overlayTtlMs: Long = 4000,
+    private val overlayTtlMs: Long = 8000,
     private val fareToleranceCop: Int = 150,
     private val distanceToleranceKm: Double = 0.15,
     private val timeToleranceMin: Int = 1
@@ -17,6 +17,9 @@ class StableDecisionGate(
     private var visible = false
 
     fun onOffer(nowMs: Long, offer: OfferCandidate, engine: SemaforoEngine): GateEvent {
+        val expired = visible && nowMs - lastShownAt >= overlayTtlMs
+        if (expired) visible = false
+
         val p = lastOffer
         val same = p != null &&
             kotlin.math.abs(p.fareCop - offer.fareCop) <= fareToleranceCop &&
@@ -30,9 +33,10 @@ class StableDecisionGate(
             lastOffer = offer
             consecutive = 1
             lastReadAt = nowMs
-            val oldVisible = visible
-            visible = false
-            return GateEvent(null, oldVisible)
+            // v0.20: do not flicker away a confirmed overlay because one OCR read
+            // changes or is partial. The old decision remains until a replacement
+            // also reaches consensus, or until the TTL expires.
+            return GateEvent(null, expired)
         }
 
         lastOffer = offer
@@ -43,7 +47,7 @@ class StableDecisionGate(
             lastShownAt = nowMs
             return GateEvent(engine.evaluate(offer), false)
         }
-        return GateEvent(null, false)
+        return GateEvent(null, expired)
     }
 
     fun onNoOffer(nowMs: Long): GateEvent {

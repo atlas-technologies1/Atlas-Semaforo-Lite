@@ -32,7 +32,7 @@ jobs:
           sha256sum "$APK" | tee "$APK.sha256"
       - uses: actions/upload-artifact@v4
         with:
-          name: Atlas-Semaforo-Lite-v0.16-debug
+          name: Atlas-Semaforo-Lite-v0.20-debug
           path: |
             app/build/outputs/apk/debug/app-debug.apk
             app/build/outputs/apk/debug/app-debug.apk.sha256

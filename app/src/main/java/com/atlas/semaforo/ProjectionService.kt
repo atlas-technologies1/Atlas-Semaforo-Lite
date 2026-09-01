@@ -48,7 +48,11 @@ class ProjectionService : Service() {
     private var reader: ImageReader? = null
     private var display: VirtualDisplay? = null
     private var thread: HandlerThread? = null
+    private var captureHandler: Handler? = null
     private var pipeline: OfferFramePipeline? = null
+    private var densityDpi: Int = 0
+    private var captureSize: CaptureSize? = null
+    private var pendingResize: CaptureSize? = null
 
     override fun onCreate() {
         super.onCreate()
@@ -90,6 +94,7 @@ class ProjectionService : Service() {
         val ht = HandlerThread("AtlasCapture").also { it.start() }
         thread = ht
         val handler = Handler(ht.looper)
+        captureHandler = handler
 
         val overlay = SemaforoOverlay(this)
         pipeline = OfferFramePipeline(overlay)
@@ -100,6 +105,17 @@ class ProjectionService : Service() {
 
         val cb = object : MediaProjection.Callback() {
             override fun onStop() = stopSelf()
+
+            override fun onCapturedContentResize(width: Int, height: Int) {
+                val size = ProjectionSurfacePolicy.normalized(width, height) ?: return
+                // Android 14+ app-only sharing reports the accurate shared-app region here.
+                // Do NOT create a second VirtualDisplay for the same MediaProjection token.
+                if (display == null) {
+                    pendingResize = size
+                } else {
+                    resizeCaptureSurface(size)
+                }
+            }
         }
         callback = cb
         p.registerCallback(cb, handler)
@@ -116,25 +132,70 @@ class ProjectionService : Service() {
             }
         }
 
-        val width = bounds.width()
-        val height = bounds.height()
-        val density = resources.displayMetrics.densityDpi
-        val ir = ImageReader.newInstance(width, height, PixelFormat.RGBA_8888, 2)
-        reader = ir
+        densityDpi = resources.displayMetrics.densityDpi
+        val initial = ProjectionSurfacePolicy.normalized(bounds.width(), bounds.height())
+            ?: run {
+                stopSelf()
+                return START_NOT_STICKY
+            }
 
-        ir.setOnImageAvailableListener({ source ->
-            val image = source.acquireLatestImage() ?: return@setOnImageAvailableListener
-            try { pipeline?.onFrame(image) } finally { image.close() }
-        }, handler)
+        val ir = createReader(initial, handler)
+        reader = ir
+        captureSize = initial
 
         display = p.createVirtualDisplay(
             "AtlasSemaforoCapture",
-            width, height, density,
+            initial.width, initial.height, densityDpi,
             DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR,
             ir.surface, null, handler
         )
 
+        pendingResize?.let {
+            pendingResize = null
+            resizeCaptureSurface(it)
+        }
+
         return START_NOT_STICKY
+    }
+
+    private fun createReader(size: CaptureSize, handler: Handler): ImageReader {
+        return ImageReader.newInstance(size.width, size.height, PixelFormat.RGBA_8888, 2).also { ir ->
+            ir.setOnImageAvailableListener({ source ->
+                val image = source.acquireLatestImage() ?: return@setOnImageAvailableListener
+                try { pipeline?.onFrame(image) } finally { image.close() }
+            }, handler)
+        }
+    }
+
+    private fun resizeCaptureSurface(requested: CaptureSize) {
+        val handler = captureHandler ?: return
+        val vd = display ?: run {
+            pendingResize = requested
+            return
+        }
+        if (!ProjectionSurfacePolicy.needsResize(captureSize, requested)) return
+
+        val newReader = try {
+            createReader(requested, handler)
+        } catch (_: Throwable) {
+            return
+        }
+
+        try {
+            // Android guidance for configuration/captured-region changes: resize the existing
+            // VirtualDisplay and replace its Surface. This preserves the one-token/one-display rule.
+            vd.resize(requested.width, requested.height, densityDpi)
+            vd.setSurface(newReader.surface)
+        } catch (_: Throwable) {
+            newReader.close()
+            return
+        }
+
+        val oldReader = reader
+        reader = newReader
+        captureSize = requested
+        try { oldReader?.setOnImageAvailableListener(null, null) } catch (_: Throwable) {}
+        try { oldReader?.close() } catch (_: Throwable) {}
     }
 
     override fun onDestroy() {
@@ -146,6 +207,8 @@ class ProjectionService : Service() {
 
         reader?.close()
         reader = null
+        captureSize = null
+        pendingResize = null
 
         val p = projection
         val cb = callback
@@ -156,6 +219,7 @@ class ProjectionService : Service() {
         try { p?.stop() } catch (_: Throwable) {}
         projection = null
 
+        captureHandler = null
         thread?.quitSafely()
         thread = null
         stopForeground(STOP_FOREGROUND_REMOVE)

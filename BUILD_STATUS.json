@@ -1,17 +1,15 @@
 {
-  "version": "0.16",
-  "staticContractsExecuted": true,
-  "pureKotlinCompileExecuted": true,
-  "pureKotlinHarnessExecuted": true,
+  "version": "0.19",
   "androidGradleCompileExecuted": false,
   "apkProduced": false,
   "apkSignatureVerified": false,
   "physicalDeviceTested": false,
-  "githubPluginInstalled": true,
-  "githubActionsToolExposedInThisRuntime": false,
-  "accessibilityServiceUsed": false,
-  "uberActionsAutomated": false,
+  "v016PhysicalInstallAndLaunchObserved": true,
+  "v016ForegroundServiceObserved": true,
+  "v016OverlayObservedAtLeastOnce": true,
+  "v016OverlayScreenshotBlockedObserved": true,
   "capturePersistence": false,
   "ocrPersistence": false,
-  "overlayConsumesTouches": false
+  "accessibilityServiceUsed": false,
+  "uberActionsAutomated": false
 }

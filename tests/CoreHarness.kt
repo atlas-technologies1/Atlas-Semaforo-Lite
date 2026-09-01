@@ -33,9 +33,9 @@ Viaje: 5 min (1.1 km)
 
     val changed = offer.copy(fareCop = 9000, tripKm = 3.0)
     val changedEvent = gate.onOffer(1900, changed, engine)
-    check(changedEvent.decision == null && changedEvent.hideOverlay)
+    check(changedEvent.decision == null && !changedEvent.hideOverlay)
     check(gate.onOffer(2300, changed, engine).decision != null)
-    check(gate.onNoOffer(6400).hideOverlay)
+    check(gate.onNoOffer(10400).hideOverlay)
 
     val cadence = FrameCadenceGate()
     check(cadence.shouldProcess(1000))
