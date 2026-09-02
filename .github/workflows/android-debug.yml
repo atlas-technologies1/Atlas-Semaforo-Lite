@@ -1,4 +1,4 @@
-name: Android APK Truth Gate
+﻿name: Android APK Truth Gate
 
 on:
   workflow_dispatch:
@@ -32,7 +32,8 @@ jobs:
           sha256sum "$APK" | tee "$APK.sha256"
       - uses: actions/upload-artifact@v4
         with:
-          name: Atlas-Semaforo-Lite-v0.26-debug
+          name: Atlas-Semaforo-Lite-v0.32-debug
           path: |
             app/build/outputs/apk/debug/app-debug.apk
             app/build/outputs/apk/debug/app-debug.apk.sha256
+

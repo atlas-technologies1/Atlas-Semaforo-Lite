@@ -1,4 +1,4 @@
-plugins {
+﻿plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
 }
@@ -14,8 +14,8 @@ android {
         applicationId = "com.atlas.semaforo"
         minSdk = 26
         targetSdk = 35
-        versionCode = 2600
-        versionName = "0.26"
+        versionCode = 3200
+        versionName = "0.32"
     }
 
     buildTypes {
@@ -38,4 +38,5 @@ dependencies {
     implementation("androidx.activity:activity-ktx:1.10.1")
     implementation("com.google.mlkit:text-recognition:16.0.1")
 }
+
 
