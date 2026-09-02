@@ -1,8 +1,6 @@
 package com.atlas.semaforo
 
-class LatestFrameScheduler<T>(
-    private val dispose: (T) -> Unit
-) {
+class LatestFrameScheduler<T>(private val dispose: (T) -> Unit) {
     private var running = false
     private var pending: T? = null
 

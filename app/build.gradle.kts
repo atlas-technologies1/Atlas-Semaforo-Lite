@@ -14,8 +14,8 @@ android {
         applicationId = "com.atlas.semaforo"
         minSdk = 26
         targetSdk = 35
-        versionCode = 3200
-        versionName = "0.32"
+        versionCode = 3300
+        versionName = "0.33"
     }
 
     buildTypes {
@@ -38,5 +38,6 @@ dependencies {
     implementation("androidx.activity:activity-ktx:1.10.1")
     implementation("com.google.mlkit:text-recognition:16.0.1")
 }
+
 
 

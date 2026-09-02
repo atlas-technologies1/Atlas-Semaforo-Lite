@@ -14,12 +14,7 @@ data class SemaforoPolicy(
     val ratingEnabled: Boolean = true,
     val excellentRating: Double = 4.85,
     val minimumRating: Double = 4.60
-) {
-    fun isValid(): Boolean =
-        hardFloorCopPerKm > 0.0 && minimumCopPerKm >= hardFloorCopPerKm && excellentCopPerKm >= minimumCopPerKm &&
-        hardFloorCopPerHour > 0.0 && minimumCopPerHour >= hardFloorCopPerHour && excellentCopPerHour >= minimumCopPerHour &&
-        minimumRating in 1.0..5.0 && excellentRating in 1.0..5.0 && excellentRating >= minimumRating
-}
+)
 
 data class EconomicMetrics(val copPerKm: Double, val copPerHour: Double, val totalKm: Double, val totalMinutes: Int)
 data class ComponentScores(val km: Int, val hour: Int, val rating: Int?)
@@ -33,61 +28,55 @@ data class SemaforoDecision(
 )
 
 class SemaforoEngine(private val policy: SemaforoPolicy = SemaforoPolicy()) {
-    init { require(policy.isValid()) }
-
     fun evaluate(offer: OfferCandidate): SemaforoDecision {
         val totalKm = offer.pickupKm + offer.tripKm
         val totalMinutes = offer.pickupMin + offer.tripMin
         require(totalKm > 0.0 && totalMinutes > 0)
-        val copPerKm = offer.fareCop / totalKm
-        val copPerHour = offer.fareCop * 60.0 / totalMinutes
-
-        val kmScore = scoreMetric(copPerKm, policy.hardFloorCopPerKm, policy.minimumCopPerKm, policy.excellentCopPerKm)
-        val hourScore = scoreMetric(copPerHour, policy.hardFloorCopPerHour, policy.minimumCopPerHour, policy.excellentCopPerHour)
-        val ratingScore = if (policy.ratingEnabled && offer.rating != null) scoreRating(offer.rating) else null
-        val ratingContribution = ratingScore ?: 70 // neutral when rating is absent/disabled
-        var score = (0.45 * kmScore + 0.45 * hourScore + 0.10 * ratingContribution).roundToInt().coerceIn(0, 100)
-
-        val bothBelowMinimum = copPerKm < policy.minimumCopPerKm && copPerHour < policy.minimumCopPerHour
-        val hardFloorHit = copPerKm < policy.hardFloorCopPerKm || copPerHour < policy.hardFloorCopPerHour
-        val ratingHardFail = policy.ratingEnabled && offer.rating != null && offer.rating < policy.minimumRating
+        val cpkm = offer.fareCop / totalKm
+        val cph = offer.fareCop * 60.0 / totalMinutes
+        val ks = scoreMetric(cpkm, policy.hardFloorCopPerKm, policy.minimumCopPerKm, policy.excellentCopPerKm)
+        val hs = scoreMetric(cph, policy.hardFloorCopPerHour, policy.minimumCopPerHour, policy.excellentCopPerHour)
+        val rs = if (policy.ratingEnabled && offer.rating != null) scoreRating(offer.rating) else null
+        val score = (0.45 * ks + 0.45 * hs + 0.10 * (rs ?: 70)).roundToInt().coerceIn(0, 100)
+        val bothLow = cpkm < policy.minimumCopPerKm && cph < policy.minimumCopPerHour
+        val hardFloor = cpkm < policy.hardFloorCopPerKm || cph < policy.hardFloorCopPerHour
+        val ratingLow = policy.ratingEnabled && offer.rating != null && offer.rating < policy.minimumRating
 
         var band = when {
-            bothBelowMinimum -> SemaforoBand.RED
+            bothLow -> SemaforoBand.RED
             score >= 80 -> SemaforoBand.GREEN
             score >= 60 -> SemaforoBand.YELLOW
             else -> SemaforoBand.RED
         }
-        if (hardFloorHit && band == SemaforoBand.GREEN) band = SemaforoBand.YELLOW
-        if (ratingHardFail && band == SemaforoBand.GREEN) band = SemaforoBand.YELLOW
+        if ((hardFloor || ratingLow) && band == SemaforoBand.GREEN) band = SemaforoBand.YELLOW
 
         val reason = when {
-            bothBelowMinimum -> "km y hora bajo mínimo"
-            hardFloorHit -> "piso económico activado"
-            hourScore >= kmScore + 15 -> "hora compensa km"
-            kmScore >= hourScore + 15 -> "km compensa hora"
+            bothLow -> "km y hora bajo mínimo"
+            hardFloor -> "piso económico activado"
+            hs >= ks + 15 -> "hora compensa km"
+            ks >= hs + 15 -> "km compensa hora"
             else -> "rentabilidad equilibrada"
         }
 
-        return SemaforoDecision(band, EconomicMetrics(copPerKm, copPerHour, totalKm, totalMinutes), offer.confidence,
-            score, ComponentScores(kmScore, hourScore, ratingScore), reason)
+        return SemaforoDecision(
+            band, EconomicMetrics(cpkm, cph, totalKm, totalMinutes),
+            offer.confidence, score, ComponentScores(ks, hs, rs), reason
+        )
     }
 
-    private fun scoreMetric(value: Double, floor: Double, minimum: Double, excellent: Double): Int = when {
-        value <= floor -> 0.0
-        value < minimum -> lerp(value, floor, minimum, 0.0, 60.0)
-        value < excellent -> lerp(value, minimum, excellent, 60.0, 100.0)
+    private fun scoreMetric(v: Double, floor: Double, min: Double, excellent: Double): Int = when {
+        v <= floor -> 0.0
+        v < min -> lerp(v, floor, min, 0.0, 60.0)
+        v < excellent -> lerp(v, min, excellent, 60.0, 100.0)
         else -> 100.0
     }.roundToInt().coerceIn(0, 100)
 
-    private fun scoreRating(rating: Double): Int = when {
-        rating < policy.minimumRating -> 20
-        rating < policy.excellentRating -> lerp(rating, policy.minimumRating, policy.excellentRating, 60.0, 100.0).roundToInt()
+    private fun scoreRating(r: Double): Int = when {
+        r < policy.minimumRating -> 20
+        r < policy.excellentRating -> lerp(r, policy.minimumRating, policy.excellentRating, 60.0, 100.0).roundToInt()
         else -> 100
     }.coerceIn(0, 100)
 
-    private fun lerp(v: Double, a: Double, b: Double, outA: Double, outB: Double): Double {
-        if (b <= a) return outB
-        return outA + ((v - a) / (b - a)).coerceIn(0.0, 1.0) * (outB - outA)
-    }
+    private fun lerp(v: Double, a: Double, b: Double, oa: Double, ob: Double): Double =
+        if (b <= a) ob else oa + ((v - a) / (b - a)).coerceIn(0.0, 1.0) * (ob - oa)
 }
