@@ -14,7 +14,18 @@ data class SemaforoPolicy(
     val ratingEnabled: Boolean = true,
     val excellentRating: Double = 4.85,
     val minimumRating: Double = 4.60
-)
+) {
+    fun isValid(): Boolean =
+        hardFloorCopPerKm > 0.0 &&
+        minimumCopPerKm >= hardFloorCopPerKm &&
+        excellentCopPerKm >= minimumCopPerKm &&
+        hardFloorCopPerHour > 0.0 &&
+        minimumCopPerHour >= hardFloorCopPerHour &&
+        excellentCopPerHour >= minimumCopPerHour &&
+        minimumRating in 1.0..5.0 &&
+        excellentRating in 1.0..5.0 &&
+        excellentRating >= minimumRating
+}
 
 data class EconomicMetrics(val copPerKm: Double, val copPerHour: Double, val totalKm: Double, val totalMinutes: Int)
 data class ComponentScores(val km: Int, val hour: Int, val rating: Int?)
